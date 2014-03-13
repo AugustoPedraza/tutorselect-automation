@@ -1,5 +1,6 @@
 require 'selenium-webdriver'
 require 'yaml'
+require 'json'
 
 Config = YAML.load_file('config.yml')
 
@@ -69,6 +70,6 @@ login(driver)
 
 opportunities_seeker = OpportunitiesSeeker.new driver
 
-open("requests.txt", "w") { |io| io.write opportunities_seeker.online_requests }
+open("requests.txt", "w") { |io| io.write JSON.pretty_generate(opportunities_seeker.online_requests) }
 
 driver.quit
