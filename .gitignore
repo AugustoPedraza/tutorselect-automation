@@ -1,4 +1,7 @@
+config.yml
+
 Gemfile.lock
+
 .ruby-version
 .ruby-gemset
-config.yml
+.rspec
