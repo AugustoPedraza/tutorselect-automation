@@ -8,6 +8,7 @@
 $LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
 
 require 'zip_codes_reader'
+require 'benchmark'
 
 RSpec.configure do |config|
   config.treat_symbols_as_metadata_keys_with_true_values = true

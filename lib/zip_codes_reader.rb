@@ -10,7 +10,3 @@ class ZipCodesReader
     end
   end
 end
-
-# place[:zip_code]
-# place[:city]
-# place[:state]
