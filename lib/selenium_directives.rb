@@ -16,10 +16,14 @@ class SeleniumDirectives
 
     @driver.find_element(:id, 'Main_LoginUser_LoginButton').click
 
-    @welcome_message = @driver.find_element(:class, WELCOME_MESSAGE_CLASS).text
+    logged?
+  end
+
+  def logged?
+    ! welcome_message.nil?
   end
 
   def welcome_message
-    @welcome_message
+    @welcome_message ||= @driver.find_element(:class, WELCOME_MESSAGE_CLASS).text
   end
 end

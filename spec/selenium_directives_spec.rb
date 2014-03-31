@@ -3,7 +3,7 @@ require 'spec_helper'
 describe SeleniumDirectives do
   describe ".login" do
     context 'when user and pass are valid' do
-      it "welcome_message is setup" do
+      it "success login" do
         navigate_stub = double('navigate')
 
         clickeable_el_mock = double('element')
@@ -26,8 +26,7 @@ describe SeleniumDirectives do
         clickeable_el_mock.should_receive(:send_keys).with('fake_pass123').once
         clickeable_el_mock.stub(:send_keys)
 
-        sut.login('fake_email@rspec.com', 'fake_pass123')
-        expect(sut.welcome_message).to eq('Hello FakeUser!')
+        expect(sut.login('fake_email@rspec.com', 'fake_pass123')).to eq(true)
       end
     end
   end
