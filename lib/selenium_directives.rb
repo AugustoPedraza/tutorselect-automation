@@ -24,10 +24,15 @@ class SeleniumDirectives
   end
 
   def welcome_message
-    @welcome_message ||= @driver.find_element(:class, WELCOME_MESSAGE_CLASS).text
+    begin
+      @driver.find_element(:class, WELCOME_MESSAGE_CLASS).text
+    rescue
+      nil
+    end
   end
 
   def setup_address(city, state, zip_code)
+    raise 'invalid login' unless logged?
     @driver.navigate.to 'https://www.tutorselect.com/portal/myaccount.aspx'
   end
 end

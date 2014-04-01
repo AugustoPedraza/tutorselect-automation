@@ -50,5 +50,16 @@ describe SeleniumDirectives do
         expect(navigate_mock).to have_received(:to).with('https://www.tutorselect.com/portal/myaccount.aspx')
       end
     end
+
+    context '.logged? is false' do
+      it "throw exception" do
+        driver_mock = double(Selenium::WebDriver::Driver)
+        allow(driver_mock).to receive(:find_element).with(:class, an_instance_of(String)).and_raise('element not found')
+
+        sut = SeleniumDirectives.new driver_mock
+
+        expect { sut.setup_address('city', 'state', 'zip_code') }.to raise_error('invalid login')
+      end
+    end
   end
 end
