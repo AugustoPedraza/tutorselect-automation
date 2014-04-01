@@ -30,4 +30,25 @@ describe SeleniumDirectives do
       end
     end
   end
+
+  describe ".setup_address" do
+    context '.logged? is true' do
+      it "navigate to profile edit url" do
+        navigate_mock = double('navigate')
+        allow(navigate_mock).to receive(:to)
+
+        text_mock = double('spanElement')
+        allow(text_mock).to receive(:text).and_return('Hello FakeUser!')
+
+        driver_mock = double(Selenium::WebDriver::Driver)
+        allow(driver_mock).to receive(:find_element).with(:class, an_instance_of(String)).and_return(text_mock)
+        allow(driver_mock).to receive(:navigate).and_return(navigate_mock)
+
+        sut = SeleniumDirectives.new driver_mock
+
+        sut.setup_address('city', 'state', 'zip_code')
+        expect(navigate_mock).to have_received(:to).with('https://www.tutorselect.com/portal/myaccount.aspx')
+      end
+    end
+  end
 end

@@ -26,4 +26,8 @@ class SeleniumDirectives
   def welcome_message
     @welcome_message ||= @driver.find_element(:class, WELCOME_MESSAGE_CLASS).text
   end
+
+  def setup_address(city, state, zip_code)
+    @driver.navigate.to 'https://www.tutorselect.com/portal/myaccount.aspx'
+  end
 end
