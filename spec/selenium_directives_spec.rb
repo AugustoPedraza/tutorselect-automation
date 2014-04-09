@@ -99,7 +99,7 @@ describe SeleniumDirectives do
     end
   end
 
-  describe ".get_table_data_by_id" do
+  describe ".get_table_data_by_container_id" do
     context '.logged? is true' do
       context "table doens't have header row" do
         it "get array of requests" do
@@ -119,23 +119,20 @@ describe SeleniumDirectives do
             i = i + 1
             table_data_mock = []
 
-            3.times do |j|
-              j = j + 1
-              username_link_mock = double("aElement#{i}#{j}")
-              allow(username_link_mock).to receive(:attribute).with('href').and_return("http://fakes/username#{i}#{j}")
+            username_link_mock = double("aElement#{i}")
+            allow(username_link_mock).to receive(:attribute).with('href').and_return("http://fakes/username#{i}")
 
-              td_username_mock = double("tdUserElement#{i}#{j}")
-              allow(td_username_mock).to receive(:text).and_return("fake username#{i}#{j}")
-              allow(td_username_mock).to receive(:find_element).with(:tag_name, 'a').and_return(username_link_mock)
+            td_username_mock = double("tdUserElement#{i}")
+            allow(td_username_mock).to receive(:text).and_return("fake username#{i}")
+            allow(td_username_mock).to receive(:find_element).with(:tag_name, 'a').and_return(username_link_mock)
 
-              td_subject_mock = double("tdSubjectElement#{i}#{j}")
-              allow(td_subject_mock).to receive(:text).and_return("fake subject#{i}#{j}")
+            td_subject_mock = double("tdSubjectElement#{i}")
+            allow(td_subject_mock).to receive(:text).and_return("fake subject#{i}")
 
-              td_date_mock = double("tdDateElement#{i}#{j}")
-              allow(td_date_mock).to receive(:text).and_return("fake date#{i}#{j}")
+            td_date_mock = double("tdDateElement#{i}")
+            allow(td_date_mock).to receive(:text).and_return("fake date#{i}")
 
-              table_data_mock << [td_username_mock, td_subject_mock, td_date_mock]
-            end
+            table_data_mock << td_username_mock << td_subject_mock << td_date_mock
 
             tr_mock = double("trElement#{i}")
             allow(tr_mock).to receive(:find_elements).with(:tag_name, 'td').and_return(table_data_mock)
@@ -143,24 +140,16 @@ describe SeleniumDirectives do
             table_rows_mock << tr_mock
           end
 
-          allow(driver_mock).to receive(:find_elements).with(:xpath, "//table[@id='id-main-table']/tbody/tr").and_return(table_rows_mock)
+          allow(driver_mock).to receive(:find_elements).with(:xpath, "//div[@id='id-main-table']/table/tbody/tr").and_return(table_rows_mock)
 
           sut = SeleniumDirectives.new driver_mock
 
-          actual = sut.get_table_data_by_id('id-main-table')
+          actual = sut.get_table_data_by_container_id('id-main-table')
 
           expect(actual).to eql([
-            { username: 'fake username11', user_profile: 'http://fakes/username11', subject:  'fake subject11', date: 'fake date11' },
-            { username: 'fake username12', user_profile: 'http://fakes/username12', subject:  'fake subject12', date: 'fake date12' },
-            { username: 'fake username13', user_profile: 'http://fakes/username13', subject:  'fake subject13', date: 'fake date13' },
-            
-            { username: 'fake username21', user_profile: 'http://fakes/username21', subject:  'fake subject21', date: 'fake date21' },
-            { username: 'fake username22', user_profile: 'http://fakes/username22', subject:  'fake subject22', date: 'fake date22' },
-            { username: 'fake username23', user_profile: 'http://fakes/username23', subject:  'fake subject23', date: 'fake date23' },
-
-            { username: 'fake username31', user_profile: 'http://fakes/username31', subject:  'fake subject31', date: 'fake date31' },
-            { username: 'fake username32', user_profile: 'http://fakes/username32', subject:  'fake subject32', date: 'fake date32' },
-            { username: 'fake username33', user_profile: 'http://fakes/username33', subject:  'fake subject33', date: 'fake date33' }
+            { username: 'fake username1', user_profile: 'http://fakes/username1', subject:  'fake subject1', date: 'fake date1' },
+            { username: 'fake username2', user_profile: 'http://fakes/username2', subject:  'fake subject2', date: 'fake date2' },
+            { username: 'fake username3', user_profile: 'http://fakes/username3', subject:  'fake subject3', date: 'fake date3' }
             ])
         end
       end

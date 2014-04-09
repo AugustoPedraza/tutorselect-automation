@@ -59,19 +59,19 @@ class SeleniumDirectives
     @driver.find_element(:id, ADDRESS_PROFILE_SUBMIT_ID).click
   end
 
-  def get_table_data_by_id(table_id)
-    # if logged?
-      xpath = "//table[@id='#{table_id}']/tbody/tr"
-      @driver.find_elements(:xpath, xpath).map do |tr|
-        tr.find_elements(:tag_name, 'td').map do |td_user, td_subject, td_date|
-          opportunity = {}
-          opportunity[:username]     = td_user.text
-          opportunity[:user_profile] = td_user.find_element(:tag_name, 'a').attribute 'href'
-          opportunity[:subject]      = td_subject.text
-          opportunity[:date]         = td_date.text
+  def get_table_data_by_container_id(table_div_container_id)
+    xpath = "//div[@id='#{table_div_container_id}']/table/tbody/tr"
 
-          opportunity
-        end
-      end.flatten(1)
+    rows = @driver.find_elements(:xpath, xpath).map { |tr| tr.find_elements(:tag_name, 'td') }
+    rows.map do |td_user, td_subject, td_date, others|
+      opportunity = {}
+
+      opportunity[:username]     = td_user.text
+      opportunity[:user_profile] = td_user.find_element(:tag_name, 'a').attribute 'href'
+      opportunity[:subject]      = td_subject.text
+      opportunity[:date]         = td_date.text
+
+      opportunity
+    end
   end
 end
