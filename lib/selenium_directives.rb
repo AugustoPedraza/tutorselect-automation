@@ -10,6 +10,10 @@ class SeleniumDirectives
   STATES_SELECT_ID          = 'Main_ddl_States'
   ADDRESS_PROFILE_SUBMIT_ID = 'Main_lb_addrSave'
 
+  DISTANCE_SELECT_ID        = 'Main_ddl_oppDist'
+
+  DISTANCE_DEFAULT          = '5'
+
   def initialize(driver)
     @driver = driver
   end
@@ -60,6 +64,10 @@ class SeleniumDirectives
   end
 
   def get_table_data_by_container_id(table_div_container_id)
+    dropDownMenu = @driver.find_element(:id, DISTANCE_SELECT_ID)
+    option       = Selenium::WebDriver::Support::Select.new(dropDownMenu)
+    option.select_by(:value, DISTANCE_DEFAULT)
+
     xpath = "//div[@id='#{table_div_container_id}']/table/tbody/tr"
 
     rows = @driver.find_elements(:xpath, xpath).map { |tr| tr.find_elements(:tag_name, 'td') }
