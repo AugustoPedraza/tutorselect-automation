@@ -85,6 +85,13 @@ describe SeleniumDirectives do
         #One time for the edit button and other for submit
         expect(@element_mock).to have_received(:click).twice
       end
+
+      it "navigate to opportunities page" do
+        sut = SeleniumDirectives.new @driver_mock
+
+        sut.setup_address('city', 'state', 'zip_code')
+        expect(@navigate_mock).to have_received(:to).with('https://www.tutorselect.com/portal/opportunities.aspx')
+      end
     end
 
     context '.logged? is false' do

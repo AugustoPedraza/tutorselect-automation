@@ -64,6 +64,7 @@ class SeleniumDirectives
     option.select_by(:value, state)
 
     @driver.find_element(:id, ADDRESS_PROFILE_SUBMIT_ID).click
+    @driver.navigate.to 'https://www.tutorselect.com/portal/opportunities.aspx'
   end
 
   def get_table_data_by_container_id(table_div_container_id)
@@ -71,11 +72,25 @@ class SeleniumDirectives
     option       = Selenium::WebDriver::Support::Select.new(dropDownMenu)
     option.select_by(:value, DISTANCE_DEFAULT)
 
-    xpath = "//div[@id='#{table_div_container_id}']/table/tbody/tr"
     opportunities = {}
-    while current_page = next_page
+
+    current_page = 1
+    while current_page
+      puts "Getting information of page #{current_page}..."
+      opportunities[current_page] = get_opportunities_for_table_container(table_div_container_id)
+
+      current_page = next_page
+    end
+
+    opportunities
+  end
+
+  private
+    def get_opportunities_for_table_container(table_div_container_id)
+      xpath = "//div[@id='#{table_div_container_id}']/table/tbody/tr"
       rows = @driver.find_elements(:xpath, xpath).map { |tr| tr.find_elements(:tag_name, 'td') }
-      op = rows.map do |td_user, td_subject, td_date, others|
+
+      rows.map do |td_user, td_subject, td_date, others|
         opportunity = {}
 
         opportunity[:username]     = td_user.text
@@ -85,14 +100,7 @@ class SeleniumDirectives
 
         opportunity
       end
-
-      opportunities[current_page] = op
     end
-
-    opportunities
-  end
-
-  private
 
     def next_page
       begin
