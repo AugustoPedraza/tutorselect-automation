@@ -14,8 +14,11 @@ class SeleniumDirectives
 
   DISTANCE_DEFAULT          = '5'
 
+  NEXT_PAGE_ID              = 'Main_lb_opppgNext'
+
   def initialize(driver)
     @driver = driver
+    @current_page = 1
   end
 
   def login(email, password)
@@ -69,17 +72,36 @@ class SeleniumDirectives
     option.select_by(:value, DISTANCE_DEFAULT)
 
     xpath = "//div[@id='#{table_div_container_id}']/table/tbody/tr"
+    opportunities = {}
+    while current_page = next_page
+      rows = @driver.find_elements(:xpath, xpath).map { |tr| tr.find_elements(:tag_name, 'td') }
+      op = rows.map do |td_user, td_subject, td_date, others|
+        opportunity = {}
 
-    rows = @driver.find_elements(:xpath, xpath).map { |tr| tr.find_elements(:tag_name, 'td') }
-    rows.map do |td_user, td_subject, td_date, others|
-      opportunity = {}
+        opportunity[:username]     = td_user.text
+        opportunity[:user_profile] = td_user.find_element(:tag_name, 'a').attribute 'href'
+        opportunity[:subject]      = td_subject.text
+        opportunity[:date]         = td_date.text
 
-      opportunity[:username]     = td_user.text
-      opportunity[:user_profile] = td_user.find_element(:tag_name, 'a').attribute 'href'
-      opportunity[:subject]      = td_subject.text
-      opportunity[:date]         = td_date.text
+        opportunity
+      end
 
-      opportunity
+      opportunities[current_page] = op
     end
+
+    opportunities
   end
+
+  private
+
+    def next_page
+      begin
+        next_page_el = @driver.find_element(:id, NEXT_PAGE_ID)
+        next_page_el.click
+        @current_page = @current_page + 1
+      rescue Selenium::WebDriver::Error::NoSuchElementError
+        @current_page = 1
+        nil
+      end
+    end
 end

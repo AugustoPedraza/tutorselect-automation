@@ -109,14 +109,6 @@ describe SeleniumDirectives do
           span_mock = double('spanElement')
           allow(span_mock).to receive(:text).and_return('Hello FakeUser!')
 
-          @driver_mock = double(Selenium::WebDriver::Driver)
-          allow(@driver_mock).to receive(:navigate).and_return(navigate_mock)
-          allow(@driver_mock).to receive(:find_element).with(:class, an_instance_of(String)).and_return(span_mock)
-        end
-
-        it "select distance of 5 miles" do
-          allow(@driver_mock).to receive(:find_elements).with(:xpath, "//div[@id='id-main-table']/table/tbody/tr").and_return([])
-
           select_item_mock = double('SelectItem')
           allow(select_item_mock).to receive(:click)
           allow(select_item_mock).to receive(:selected?).and_return(:false)
@@ -124,58 +116,103 @@ describe SeleniumDirectives do
           element_mock = double('element')
 
           #Used as combobox. This stub methods are required for Selenium::WebDriver::Support::Select
-          allow(element_mock).to receive(:tag_name).and_return('select')
-          allow(element_mock).to receive(:attribute).with(:multiple)
-          allow(element_mock).to receive(:find_elements).with(:xpath, /5/).and_return([select_item_mock])
+          allow(@element_mock).to receive(:tag_name).and_return('select')
+          allow(@element_mock).to receive(:attribute).with(:multiple)
+          allow(@element_mock).to receive(:find_elements).with(:xpath, /5/).and_return([select_item_mock])
 
-          allow(@driver_mock).to receive(:find_element).with(:id, 'Main_ddl_oppDist').and_return(element_mock)
+          @driver_mock = double(Selenium::WebDriver::Driver)
+          allow(@driver_mock).to receive(:navigate).and_return(navigate_mock)
+          allow(@driver_mock).to receive(:find_element).with(:class, an_instance_of(String)).and_return(span_mock)
+
+          allow(@driver_mock).to receive(:find_element).with(:id, 'Main_ddl_oppDist').and_return(@element_mock)
+        end
+
+        it "select distance of 5 miles" do
+          allow(@driver_mock).to receive(:find_elements).with(:xpath, "//div[@id='id-main-table']/table/tbody/tr").and_return([])
 
           sut = SeleniumDirectives.new @driver_mock
           sut.get_table_data_by_container_id('id-main-table')
 
           expect(@driver_mock).to have_received(:find_element).with(:id, 'Main_ddl_oppDist').once
-          expect(element_mock).to have_received(:find_elements).with(:xpath, ".//option[@value = \"5\"]")
+          expect(@element_mock).to have_received(:find_elements).with(:xpath, ".//option[@value = \"5\"]")
         end
 
-        it "get array of requests" do
-          table_rows_mock = []
+        context 'area request have just one page' do
+          it "get array of requests" do
+            table_rows_mock = []
 
-          3.times do |i|
-            i = i + 1
-            table_data_mock = []
+            3.times do |i|
+              i = i + 1
+              table_data_mock = []
 
-            username_link_mock = double("aElement#{i}")
-            allow(username_link_mock).to receive(:attribute).with('href').and_return("http://fakes/username#{i}")
+              username_link_mock = double("aElement#{i}")
+              allow(username_link_mock).to receive(:attribute).with('href').and_return("http://fakes/username#{i}")
 
-            td_username_mock = double("tdUserElement#{i}")
-            allow(td_username_mock).to receive(:text).and_return("fake username#{i}")
-            allow(td_username_mock).to receive(:find_element).with(:tag_name, 'a').and_return(username_link_mock)
+              td_username_mock = double("tdUserElement#{i}")
+              allow(td_username_mock).to receive(:text).and_return("fake username#{i}")
+              allow(td_username_mock).to receive(:find_element).with(:tag_name, 'a').and_return(username_link_mock)
 
-            td_subject_mock = double("tdSubjectElement#{i}")
-            allow(td_subject_mock).to receive(:text).and_return("fake subject#{i}")
+              td_subject_mock = double("tdSubjectElement#{i}")
+              allow(td_subject_mock).to receive(:text).and_return("fake subject#{i}")
 
-            td_date_mock = double("tdDateElement#{i}")
-            allow(td_date_mock).to receive(:text).and_return("fake date#{i}")
+              td_date_mock = double("tdDateElement#{i}")
+              allow(td_date_mock).to receive(:text).and_return("fake date#{i}")
 
-            table_data_mock << td_username_mock << td_subject_mock << td_date_mock
+              table_data_mock << td_username_mock << td_subject_mock << td_date_mock
 
-            tr_mock = double("trElement#{i}")
-            allow(tr_mock).to receive(:find_elements).with(:tag_name, 'td').and_return(table_data_mock)
+              tr_mock = double("trElement#{i}")
+              allow(tr_mock).to receive(:find_elements).with(:tag_name, 'td').and_return(table_data_mock)
 
-            table_rows_mock << tr_mock
+              table_rows_mock << tr_mock
+            end
+
+            allow(@driver_mock).to receive(:find_elements).with(:xpath, "//div[@id='id-main-table']/table/tbody/tr").and_return(table_rows_mock)
+
+            sut = SeleniumDirectives.new @driver_mock
+
+            actual = sut.get_table_data_by_container_id('id-main-table')
+
+            expect(actual).to eql({ 1 =>
+              [{ username: 'fake username1', user_profile: 'http://fakes/username1', subject:  'fake subject1', date: 'fake date1' },
+              { username: 'fake username2', user_profile: 'http://fakes/username2', subject:  'fake subject2', date: 'fake date2' },
+              { username: 'fake username3', user_profile: 'http://fakes/username3', subject:  'fake subject3', date: 'fake date3' }
+              ]})
           end
+        end
 
-          allow(@driver_mock).to receive(:find_elements).with(:xpath, "//div[@id='id-main-table']/table/tbody/tr").and_return(table_rows_mock)
+        context 'area request have three' do
+          it "navigate every page" do
+            driver_mock = double(Selenium::WebDriver::Driver)
+            allow(driver_mock).to receive(:navigate).and_return(@navigate_mock)
 
-          sut = SeleniumDirectives.new @driver_mock
+            page_number = 1
 
-          actual = sut.get_table_data_by_container_id('id-main-table')
+            next_page_link_mock = double('linkElement')
+            allow(next_page_link_mock).to receive(:click)
 
-          expect(actual).to eql([
-            { username: 'fake username1', user_profile: 'http://fakes/username1', subject:  'fake subject1', date: 'fake date1' },
-            { username: 'fake username2', user_profile: 'http://fakes/username2', subject:  'fake subject2', date: 'fake date2' },
-            { username: 'fake username3', user_profile: 'http://fakes/username3', subject:  'fake subject3', date: 'fake date3' }
-            ])
+            allow(driver_mock).to receive(:find_element) do |type, value|
+              return_value = nil
+
+              return_value = @span_mock    if type == :class
+              return_value = @element_mock if type == :id and value == 'Main_ddl_oppDist'
+
+              if type == :id and value == 'Main_lb_opppgNext'
+                raise Selenium::WebDriver::Error::NoSuchElementError if page_number > 3
+                return_value =  next_page_link_mock
+                page_number = page_number + 1
+              end
+
+              return_value
+            end
+
+            allow(driver_mock).to receive(:find_elements).with(:xpath, "//div[@id='id-main-table']/table/tbody/tr").and_return([])
+
+            sut = SeleniumDirectives.new driver_mock
+
+            actual = sut.get_table_data_by_container_id('id-main-table')
+
+            expect(next_page_link_mock).to have_received(:click).exactly(3)
+          end
         end
       end
     end
