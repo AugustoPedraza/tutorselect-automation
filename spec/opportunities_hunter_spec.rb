@@ -31,6 +31,7 @@ describe OpportunitiesHunter do
               }
           end
 
+          allow(selenium_directives_mock).to receive(:logged?).and_return(true).ordered
           allow(selenium_directives_mock).to receive(:setup_address).with(kind_of(String), kind_of(String), kind_of(String)).ordered
           allow(selenium_directives_mock).to receive(:get_table_data_by_container_id).with(kind_of(String)).and_return(fake_opportunities).ordered
           allow(selenium_directives_mock).to receive(:send_message).with(kind_of(Integer), kind_of(String)).ordered
@@ -51,22 +52,19 @@ describe OpportunitiesHunter do
 
     context "receive a selenium directives instance not logged" do
       it "try login" do
-        pending("something else getting finished")
-        this_should_not_get_executed
-        # selenium_directives_mock = double('selenium_directives')
+        selenium_directives_mock = double('selenium_directives')
 
-        # allow(selenium_directives_mock).to receive(:logged?).and_return(false)
-        # allow(selenium_directives_mock).to receive(:login).with(kind_of(String), kind_of(String))
-        # allow(selenium_directives_mock).to receive(:setup_address).with(kind_of(String), kind_of(String), kind_of(String))
-        # allow(selenium_directives_mock).to receive(:get_table_data_by_container_id).with(kind_of(String)).and_return([])
-        # allow(selenium_directives_mock).to receive(:send_message).with(kind_of(Integer), kind_of(String))
+        allow(selenium_directives_mock).to receive(:logged?).and_return(false).ordered
+        allow(selenium_directives_mock).to receive(:login).with(kind_of(String), kind_of(String)).ordered
+        allow(selenium_directives_mock).to receive(:setup_address).with(kind_of(String), kind_of(String), kind_of(String))
+        allow(selenium_directives_mock).to receive(:get_table_data_by_container_id).with(kind_of(String)).and_return([])
+        allow(selenium_directives_mock).to receive(:send_message).with(kind_of(Integer), kind_of(String))
 
-        # dummy_location  = Location.new({ city: "fake city", state: :NY, zip_code: 11011 })
-        # sut = OpportunitiesHunter.new(selenium_directives_mock, "fake subject", dummy_location)
+        dummy_location  = Location.new({ city: "fake city", state: :NY, zip_code: 11011 })
+        sut = OpportunitiesHunter.new(selenium_directives_mock, "fake@email.com", "fake_password")
+        sut.hunter_all(dummy_location, 'dummy subject')
 
-        # sut.hunter_all
-
-        # expect(selenium_directives_mock).to have_received(:login).once.with("fake city", "NY", "11011")
+        expect(selenium_directives_mock).to have_received(:login).once.with("fake@email.com", "fake_password")
       end
     end
   end
