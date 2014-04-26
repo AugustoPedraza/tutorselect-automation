@@ -1,9 +1,10 @@
 class OpportunitiesHunter
 
-  attr_accessor :subjects
+  attr_reader :subjects, :location
 
-  def initialize(subject)
+  def initialize(subject, location)
     @subjects ||= []
     @subjects << subject
+    @location = location
   end
 end
