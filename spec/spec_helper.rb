@@ -10,6 +10,7 @@ $LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
 require 'zip_codes_reader'
 require 'selenium_directives'
 require 'opportunities_analyzer'
+require 'opportunities_hunter'
 
 require 'benchmark'
 require 'selenium-webdriver'
