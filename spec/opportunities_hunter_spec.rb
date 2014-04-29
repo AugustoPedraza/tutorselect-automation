@@ -96,6 +96,56 @@ describe OpportunitiesHunter do
             expect(selenium_directives_mock).to have_received(:send_message).once.with(fake_id, 'fake message')
           end
         end
+
+        context "error to sent a message" do
+          it "manage the error a sent the others messages" do
+            selenium_directives_mock = double('selenium_directives')
+
+            fake_opportunities = []
+            10.times do |i|
+              i = i + 1
+              fake_opportunities <<
+                {
+                  username:     "fake username#{i}",
+                  user_profile: "http://fakes/#{i.to_s * 3}",
+                  subject:      %w{Math Science Chemistry Geometry Accounting Physics SAT Spanish Statistics}.sample,
+                  date:         "fake date#{i}"
+                }
+            end
+
+            fake_opportunities << { username: "fake usr707", user_profile: "http://fakes/707",
+              subject: "fake subject", date: "fake date77"
+            }
+
+            fake_opportunities << { username: "fake usr808", user_profile: "http://fakes/808",
+              subject: "fake subject", date: "fake date808"
+            }
+
+
+            fake_opportunities << { username: "fake usr909", user_profile: "http://fakes/909",
+              subject: "fake subject", date: "fake date909"
+            }
+
+            allow(selenium_directives_mock).to receive(:logged?).and_return(true).ordered
+            allow(selenium_directives_mock).to receive(:setup_address).with(kind_of(String), kind_of(String), kind_of(String)).ordered
+            allow(selenium_directives_mock).to receive(:get_table_data_by_container_id).with(kind_of(String)).and_return(fake_opportunities).ordered
+            allow(selenium_directives_mock).to receive(:send_message).with(kind_of(Integer), kind_of(String)).ordered
+            allow(selenium_directives_mock).to receive(:send_message).with(808, 'fake message').and_raise('FailMessageSending')
+
+            fake_location  = Location.new({ city: "fake city", state: :NY, zip_code: 11011 })
+            sut = OpportunitiesHunter.new(selenium_directives_mock, "dummy@email.com", "dummy_password")
+
+            sut.hunter_all(fake_location, "fake subject")
+
+            expect(selenium_directives_mock).to have_received(:setup_address).once.with("fake city", "NY", "11011")
+
+            expect(selenium_directives_mock).to have_received(:send_message).with(any_args()).exactly(3)
+
+            [707, 808, 909].each do |fake_id|
+              expect(selenium_directives_mock).to have_received(:send_message).once.with(fake_id, 'fake message')
+            end
+          end
+        end
       end
     end
 

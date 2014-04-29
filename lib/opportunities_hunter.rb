@@ -21,7 +21,11 @@ class OpportunitiesHunter
     @selenium_directives.get_table_data_by_container_id(AREA_REQUEST_TABLE_ID).each do |opportunity|
       next unless opportunity[:subject].include?(subject)
       user_id  = opportunity[:user_profile].split('/').last.to_i
-      @selenium_directives.send_message(user_id, CUSTOM_MESSAGE)
+
+      begin
+        @selenium_directives.send_message(user_id, CUSTOM_MESSAGE)
+      rescue Exception => e
+      end
     end
 
   end
