@@ -180,9 +180,9 @@ describe SeleniumDirectives do
             actual = sut.get_table_data_by_container_id('id-main-table')
 
             expect(actual).to eql({ 1 =>
-              [{ username: 'fake username1', user_profile: 'http://fakes/username1', subject:  'fake subject1', date: 'fake date1' },
-              { username: 'fake username2', user_profile: 'http://fakes/username2', subject:  'fake subject2', date: 'fake date2' },
-              { username: 'fake username3', user_profile: 'http://fakes/username3', subject:  'fake subject3', date: 'fake date3' }
+              [{ username: 'fake username1', request_id: 'http://fakes/username1', subject:  'fake subject1', date: 'fake date1' },
+              { username: 'fake username2', request_id: 'http://fakes/username2', subject:  'fake subject2', date: 'fake date2' },
+              { username: 'fake username3', request_id: 'http://fakes/username3', subject:  'fake subject3', date: 'fake date3' }
               ]})
           end
         end
@@ -221,6 +221,36 @@ describe SeleniumDirectives do
             expect(next_page_link_mock).to have_received(:click).exactly(3)
           end
         end
+      end
+    end
+  end
+
+  describe ".send_message" do
+    context "valid request id" do
+      it "send a tutorselect message" do
+        navigate_mock = double('navigateElement')
+        allow(navigate_mock).to receive(:to).ordered
+
+        text_box_mock = double('textBoxElement')
+        allow(text_box_mock).to receive(:clear).ordered
+        allow(text_box_mock).to receive(:send_keys).ordered
+
+        link_button_mock = double('aElement')
+        allow(link_button_mock).to receive(:click).ordered
+
+        driver_mock = double(Selenium::WebDriver::Driver)
+        allow(driver_mock).to receive(:navigate).and_return(navigate_mock)
+        allow(driver_mock).to receive(:find_element).with(:id, 'Main_tbMSG').and_return(text_box_mock)
+        allow(driver_mock).to receive(:find_element).with(:id, 'Main_bs').and_return(link_button_mock)
+
+        sut = SeleniumDirectives.new driver_mock
+
+        sut.send_message(77077, 'fake message')
+
+        expect(navigate_mock).to have_received(:to).once.with("https://www.tutorselect.com/portal/viewcprofile.aspx?trid=77077")
+        expect(text_box_mock).to have_received(:clear).once
+        expect(text_box_mock).to have_received(:send_keys).once.with('fake message')
+        expect(link_button_mock).to have_received(:click).once
       end
     end
   end

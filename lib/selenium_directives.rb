@@ -16,6 +16,9 @@ class SeleniumDirectives
 
   NEXT_PAGE_ID              = 'Main_lb_opppgNext'
 
+  MESSAGE_TEXT_BOX_ID       = 'Main_tbMSG'
+  SEND_MESSAGE_BUTTON_ID    = 'Main_bs'
+
   def initialize(driver)
     @driver = driver
     @current_page = 1
@@ -85,6 +88,18 @@ class SeleniumDirectives
     opportunities
   end
 
+  def send_message(request_id, message)
+    request_url_format_string = "https://www.tutorselect.com/portal/viewcprofile.aspx?trid=%d"
+
+    @driver.navigate.to(request_url_format_string % [request_id])
+
+    text_box = @driver.find_element(:id, MESSAGE_TEXT_BOX_ID)
+    text_box.clear
+    text_box.send_keys(message)
+
+    @driver.find_element(:id, SEND_MESSAGE_BUTTON_ID).click
+  end
+
   private
     def get_opportunities_for_table_container(table_div_container_id)
       xpath = "//div[@id='#{table_div_container_id}']/table/tbody/tr"
@@ -94,7 +109,7 @@ class SeleniumDirectives
         opportunity = {}
 
         opportunity[:username]     = td_user.text
-        opportunity[:user_profile] = td_user.find_element(:tag_name, 'a').attribute 'href'
+        opportunity[:request_id] = td_user.find_element(:tag_name, 'a').attribute 'href'
         opportunity[:subject]      = td_subject.text
         opportunity[:date]         = td_date.text
 
