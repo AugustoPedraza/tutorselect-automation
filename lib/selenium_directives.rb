@@ -19,6 +19,10 @@ class SeleniumDirectives
   MESSAGE_TEXT_BOX_ID       = 'Main_tbMSG'
   SEND_MESSAGE_BUTTON_ID    = 'Main_bs'
 
+  MESSAGE_SEND_RESULT_ID    = 'Main_lbl_msgError'
+
+  SUCCESS_MESSAGE           = 'Your message was sent!'
+
   def initialize(driver)
     @driver = driver
     @current_page = 1
@@ -98,6 +102,8 @@ class SeleniumDirectives
     text_box.send_keys(message)
 
     @driver.find_element(:id, SEND_MESSAGE_BUTTON_ID).click
+
+    @driver.find_element(:id, MESSAGE_SEND_RESULT_ID).text == SUCCESS_MESSAGE
   end
 
   private
