@@ -284,6 +284,33 @@ describe SeleniumDirectives do
           expect(span_mock).to have_received(:text).once
         end
       end
+
+      context "message doenst send" do
+        it "raise a error with the receive message" do
+          navigate_mock = double('navigateElement')
+          allow(navigate_mock).to receive(:to).ordered
+
+          text_box_mock = double('textBoxElement')
+          allow(text_box_mock).to receive(:clear).ordered
+          allow(text_box_mock).to receive(:send_keys).ordered
+
+          link_button_mock = double('aElement')
+          allow(link_button_mock).to receive(:click).ordered
+
+          span_mock = double('spanElement')
+          allow(span_mock).to receive(:text).and_return('Some error message')
+
+          driver_mock = double(Selenium::WebDriver::Driver)
+          allow(driver_mock).to receive(:navigate).and_return(navigate_mock)
+          allow(driver_mock).to receive(:find_element).with(:id, 'Main_tbMSG').and_return(text_box_mock)
+          allow(driver_mock).to receive(:find_element).with(:id, 'Main_bs').and_return(link_button_mock)
+          allow(driver_mock).to receive(:find_element).with(:id, 'Main_lbl_msgError').and_return(span_mock).ordered
+
+          sut = SeleniumDirectives.new driver_mock
+
+          expect(lambda{ sut.send_message(77077, 'fake message') }).to raise_error('Some error message')
+        end
+      end
     end
   end
 end

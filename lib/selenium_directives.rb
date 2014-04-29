@@ -103,7 +103,13 @@ class SeleniumDirectives
 
     @driver.find_element(:id, SEND_MESSAGE_BUTTON_ID).click
 
-    @driver.find_element(:id, MESSAGE_SEND_RESULT_ID).text == SUCCESS_MESSAGE
+    message = @driver.find_element(:id, MESSAGE_SEND_RESULT_ID).text
+
+    if message == SUCCESS_MESSAGE
+      true
+    else
+      raise StandardError, message
+    end
   end
 
   private
