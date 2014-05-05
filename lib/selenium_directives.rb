@@ -94,6 +94,7 @@ class SeleniumDirectives
 
   def send_message(request_id, message)
     request_url_format_string = "https://www.tutorselect.com/portal/viewcprofile.aspx?trid=%d"
+    file_path = File.join(File.dirname(__FILE__), '..', "data")
 
     url = request_url_format_string % [request_id]
     puts "Driver navigation to #{url}"
@@ -104,9 +105,13 @@ class SeleniumDirectives
     text_box.clear
     text_box.send_keys(message)
 
+    @driver.save_screenshot "#{file_path}/#{request_id}_begin.png"
+
     @driver.find_element(:id, SEND_MESSAGE_BUTTON_ID).click
 
     message = @driver.find_element(:id, MESSAGE_SEND_RESULT_ID).text
+
+    @driver.save_screenshot "#{file_path}/#{request_id}_end.png"
 
     if message == SUCCESS_MESSAGE
       true

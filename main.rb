@@ -20,7 +20,7 @@ begin
 
   location = Location.new({city: 'San Jose', state: 'CA', zip_code: '95111'})
 
-  opp_hunter.hunter_all(location, 'Twitter Boostrap', Message)
+  opp_hunter.hunter_all(location, Config['subject'], Message)
 rescue Exception => e
   puts e
   puts e.backtrace.join("\n")

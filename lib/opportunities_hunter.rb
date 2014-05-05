@@ -22,6 +22,8 @@ class OpportunitiesHunter
 
     sent_msg_counter = 0
 
+
+    puts "hunter opportunities for '#{subject}' subject"
     @selenium_directives.get_table_data_by_container_id(AREA_REQUEST_TABLE_ID).values.flatten.each do |opportunity|
 
       next unless opportunity[:subject].downcase.include?(subject.downcase)
