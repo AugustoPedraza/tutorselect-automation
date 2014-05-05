@@ -135,14 +135,14 @@ describe SeleniumDirectives do
           allow(@driver_mock).to receive(:find_element).with(:id, 'Main_lb_opppgNext').and_raise(Selenium::WebDriver::Error::NoSuchElementError)
         end
 
-        it "select distance of 5 miles" do
+        it "select distance of 50 miles" do
           allow(@driver_mock).to receive(:find_elements).with(:xpath, "//div[@id='id-main-table']/table/tbody/tr").and_return([])
 
           sut = SeleniumDirectives.new @driver_mock
           sut.get_table_data_by_container_id('id-main-table')
 
           expect(@driver_mock).to have_received(:find_element).with(:id, 'Main_ddl_oppDist').once
-          expect(@element_mock).to have_received(:find_elements).with(:xpath, ".//option[@value = \"5\"]")
+          expect(@element_mock).to have_received(:find_elements).with(:xpath, ".//option[@value = \"50\"]")
         end
 
         context 'area request have just one page' do

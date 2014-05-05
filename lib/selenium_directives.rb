@@ -12,7 +12,7 @@ class SeleniumDirectives
 
   DISTANCE_SELECT_ID        = 'Main_ddl_oppDist'
 
-  DISTANCE_DEFAULT          = '5'
+  DISTANCE_DEFAULT          = '50'
 
   NEXT_PAGE_ID              = 'Main_lb_opppgNext'
 
