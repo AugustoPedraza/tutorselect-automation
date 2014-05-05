@@ -95,7 +95,10 @@ class SeleniumDirectives
   def send_message(request_id, message)
     request_url_format_string = "https://www.tutorselect.com/portal/viewcprofile.aspx?trid=%d"
 
-    @driver.navigate.to(request_url_format_string % [request_id])
+    url = request_url_format_string % [request_id]
+    puts "Driver navigation to #{url}"
+    @driver.navigate.to(url)
+
 
     text_box = @driver.find_element(:id, MESSAGE_TEXT_BOX_ID)
     text_box.clear

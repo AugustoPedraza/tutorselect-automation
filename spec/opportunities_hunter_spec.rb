@@ -25,7 +25,7 @@ describe OpportunitiesHunter do
             fake_opportunities <<
               {
                 username:     "fake username#{i}",
-                user_profile: "http://fakes/#{i.to_s * 3}",
+                request_id: "http://fakes/viewcprofile.aspx?trid=#{i.to_s * 3}",
                 subject:      "fake subject",
                 date:         "fake date#{i}"
               }
@@ -33,7 +33,7 @@ describe OpportunitiesHunter do
 
           allow(selenium_directives_mock).to receive(:logged?).and_return(true).ordered
           allow(selenium_directives_mock).to receive(:setup_address).with(kind_of(String), kind_of(String), kind_of(String)).ordered
-          allow(selenium_directives_mock).to receive(:get_table_data_by_container_id).with(kind_of(String)).and_return(fake_opportunities).ordered
+          allow(selenium_directives_mock).to receive(:get_table_data_by_container_id).with(kind_of(String)).and_return({1 => fake_opportunities}).ordered
           allow(selenium_directives_mock).to receive(:send_message).with(kind_of(Integer), kind_of(String)).ordered
 
           fake_location  = Location.new({ city: "fake city", state: :NY, zip_code: 11011 })
@@ -59,28 +59,28 @@ describe OpportunitiesHunter do
             fake_opportunities <<
               {
                 username:     "fake username#{i}",
-                user_profile: "http://fakes/#{i.to_s * 3}",
+                request_id: "http://fakes/viewcprofile.aspx?trid=#{i.to_s * 3}",
                 subject:      %w{Math Science Chemistry Geometry Accounting Physics SAT Spanish Statistics}.sample,
                 date:         "fake date#{i}"
               }
           end
 
-          fake_opportunities << { username: "fake usr707", user_profile: "http://fakes/707",
+          fake_opportunities << { username: "fake usr707", request_id: "http://fakes/viewcprofile.aspx?trid=707",
             subject: "fake subject", date: "fake date77"
           }
 
-          fake_opportunities << { username: "fake usr808", user_profile: "http://fakes/808",
+          fake_opportunities << { username: "fake usr808", request_id: "http://fakes/viewcprofile.aspx?trid=808",
             subject: "fake subject", date: "fake date808"
           }
 
 
-          fake_opportunities << { username: "fake usr909", user_profile: "http://fakes/909",
+          fake_opportunities << { username: "fake usr909", request_id: "http://fakes/viewcprofile.aspx?trid=909",
             subject: "fake subject", date: "fake date909"
           }
 
           allow(selenium_directives_mock).to receive(:logged?).and_return(true).ordered
           allow(selenium_directives_mock).to receive(:setup_address).with(kind_of(String), kind_of(String), kind_of(String)).ordered
-          allow(selenium_directives_mock).to receive(:get_table_data_by_container_id).with(kind_of(String)).and_return(fake_opportunities).ordered
+          allow(selenium_directives_mock).to receive(:get_table_data_by_container_id).with(kind_of(String)).and_return({1 => fake_opportunities}).ordered
           allow(selenium_directives_mock).to receive(:send_message).with(kind_of(Integer), kind_of(String)).ordered
 
           fake_location  = Location.new({ city: "fake city", state: :NY, zip_code: 11011 })
@@ -107,28 +107,28 @@ describe OpportunitiesHunter do
               fake_opportunities <<
                 {
                   username:     "fake username#{i}",
-                  user_profile: "http://fakes/#{i.to_s * 3}",
+                  request_id: "http://fakes/viewcprofile.aspx?trid=#{i.to_s * 3}",
                   subject:      %w{Math Science Chemistry Geometry Accounting Physics SAT Spanish Statistics}.sample,
                   date:         "fake date#{i}"
                 }
             end
 
-            fake_opportunities << { username: "fake usr707", user_profile: "http://fakes/707",
+            fake_opportunities << { username: "fake usr707", request_id: "http://fakes/viewcprofile.aspx?trid=707",
               subject: "fake subject", date: "fake date77"
             }
 
-            fake_opportunities << { username: "fake usr808", user_profile: "http://fakes/808",
+            fake_opportunities << { username: "fake usr808", request_id: "http://fakes/viewcprofile.aspx?trid=808",
               subject: "fake subject", date: "fake date808"
             }
 
 
-            fake_opportunities << { username: "fake usr909", user_profile: "http://fakes/909",
+            fake_opportunities << { username: "fake usr909", request_id: "http://fakes/viewcprofile.aspx?trid=909",
               subject: "fake subject", date: "fake date909"
             }
 
             allow(selenium_directives_mock).to receive(:logged?).and_return(true).ordered
             allow(selenium_directives_mock).to receive(:setup_address).with(kind_of(String), kind_of(String), kind_of(String)).ordered
-            allow(selenium_directives_mock).to receive(:get_table_data_by_container_id).with(kind_of(String)).and_return(fake_opportunities).ordered
+            allow(selenium_directives_mock).to receive(:get_table_data_by_container_id).with(kind_of(String)).and_return({1 => fake_opportunities}).ordered
             allow(selenium_directives_mock).to receive(:send_message).with(kind_of(Integer), kind_of(String)).ordered
             allow(selenium_directives_mock).to receive(:send_message).with(808, 'fake message').and_raise('FailMessageSending')
 
@@ -156,7 +156,7 @@ describe OpportunitiesHunter do
         allow(selenium_directives_mock).to receive(:logged?).and_return(false).ordered
         allow(selenium_directives_mock).to receive(:login).with(kind_of(String), kind_of(String)).ordered
         allow(selenium_directives_mock).to receive(:setup_address).with(kind_of(String), kind_of(String), kind_of(String))
-        allow(selenium_directives_mock).to receive(:get_table_data_by_container_id).with(kind_of(String)).and_return([])
+        allow(selenium_directives_mock).to receive(:get_table_data_by_container_id).with(kind_of(String)).and_return({1 =>[]})
         allow(selenium_directives_mock).to receive(:send_message).with(kind_of(Integer), kind_of(String))
 
         dummy_location  = Location.new({ city: "fake city", state: :NY, zip_code: 11011 })
