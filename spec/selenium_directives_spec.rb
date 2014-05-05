@@ -132,6 +132,7 @@ describe SeleniumDirectives do
           allow(@driver_mock).to receive(:find_element).with(:class, an_instance_of(String)).and_return(span_mock)
 
           allow(@driver_mock).to receive(:find_element).with(:id, 'Main_ddl_oppDist').and_return(@element_mock)
+          allow(@driver_mock).to receive(:find_element).with(:id, 'Main_lb_opppgNext').and_raise(Selenium::WebDriver::Error::NoSuchElementError)
         end
 
         it "select distance of 5 miles" do
@@ -238,10 +239,14 @@ describe SeleniumDirectives do
         link_button_mock = double('aElement')
         allow(link_button_mock).to receive(:click).ordered
 
+        label_mock = double('lblElement')
+        allow(label_mock).to receive(:text).and_return('Your message was sent!')
+
         driver_mock = double(Selenium::WebDriver::Driver)
         allow(driver_mock).to receive(:navigate).and_return(navigate_mock)
         allow(driver_mock).to receive(:find_element).with(:id, 'Main_tbMSG').and_return(text_box_mock)
         allow(driver_mock).to receive(:find_element).with(:id, 'Main_bs').and_return(link_button_mock)
+        allow(driver_mock).to receive(:find_element).with(:id, 'Main_lbl_msgError').and_return(label_mock)
 
         sut = SeleniumDirectives.new driver_mock
 
