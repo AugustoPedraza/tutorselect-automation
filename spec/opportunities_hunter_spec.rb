@@ -14,35 +14,43 @@ describe OpportunitiesHunter do
   describe ".hunter_all" do
     context "selenium directives instance already logged" do
       context "5 opportunities founded" do
-        it "send 5 messages" do
-          selenium_directives_mock = double('selenium_directives')
+        before(:each) do
+          @selenium_directives_mock = double('selenium_directives')
 
-          fake_opportunities = []
-           5.times do |i|
-            i = i + 1
-            fake_opportunities <<
+          allow(@selenium_directives_mock).to receive(:logged?).and_return(true).ordered
+
+          allow(@selenium_directives_mock).to receive(:setup_address)
+            .with(kind_of(String), kind_of(String), kind_of(String)).ordered
+
+          allow(@selenium_directives_mock).to receive(:get_table_data_by_container_id)
+            .with(kind_of(String)).and_return({1 => fake_opportunities}).ordered
+
+          allow(@selenium_directives_mock).to receive(:send_message)
+            .with(kind_of(Integer), kind_of(String)).ordered
+        end
+
+        let(:fake_opportunities) do
+          (1..5).to_a.map do |i|
               {
-                username:     "fake username#{i}",
+                username:   "fake username#{i}",
                 request_id: "http://fakes/viewcprofile.aspx?trid=#{i.to_s * 3}",
-                subject:      "fake subject",
-                date:         "fake date#{i}"
+                subject:    "fake subject",
+                date:       "fake date#{i}"
               }
           end
+        end
 
-          allow(selenium_directives_mock).to receive(:logged?).and_return(true).ordered
-          allow(selenium_directives_mock).to receive(:setup_address).with(kind_of(String), kind_of(String), kind_of(String)).ordered
-          allow(selenium_directives_mock).to receive(:get_table_data_by_container_id).with(kind_of(String)).and_return({1 => fake_opportunities}).ordered
-          allow(selenium_directives_mock).to receive(:send_message).with(kind_of(Integer), kind_of(String)).ordered
+        let(:fake_location) { Location.new({ city: "fake city", state: :NY, zip_code: 11011 }) }
 
-          fake_location  = Location.new({ city: "fake city", state: :NY, zip_code: 11011 })
-          sut = OpportunitiesHunter.new(selenium_directives_mock, "dummy@email.com", "dummy_password")
+        subject { OpportunitiesHunter.new(@selenium_directives_mock, "dummy@email.com", "dummy_password") }
 
-          sut.hunter_all(fake_location, "fake subject")
+        it "send 5 messages" do
+          subject.hunter_all(fake_location, "fake subject")
 
-          expect(selenium_directives_mock).to have_received(:setup_address).once.with("fake city", "NY", "11011")
+          expect(@selenium_directives_mock).to have_received(:setup_address).once.with("fake city", "NY", "11011")
 
           [111, 222, 333, 444, 555].each do |fake_id|
-            expect(selenium_directives_mock).to have_received(:send_message).once.with(fake_id, 'fake message')
+            expect(@selenium_directives_mock).to have_received(:send_message).once.with(fake_id, 'fake message')
           end
         end
       end
