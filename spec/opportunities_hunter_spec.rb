@@ -2,14 +2,12 @@ require 'spec_helper'
 
 describe OpportunitiesHunter do
   describe "initialization" do
-    context "with valid credentials" do
-      it "create a valid object" do
-        fake_selenium_directives = double(SeleniumDirectives)
+    before { @selenium_directives_mock = double(SeleniumDirectives) }
+    subject { OpportunitiesHunter.new(@selenium_directives_mock, "fake@email.com", "fake_password") }
 
-        sut = OpportunitiesHunter.new(fake_selenium_directives, "fake@email.com", "fake_password")
-        expect(sut.account_email).to eql("fake@email.com")
-        expect(sut.account_password).to eql("fake_password")
-      end
+    it "set email and password" do
+      expect(subject.account_email).to eql("fake@email.com")
+      expect(subject.account_password).to eql("fake_password")
     end
   end
 
