@@ -13,8 +13,8 @@ describe OpportunitiesHunter do
 
   describe ".hunter_all" do
     context "selenium directives instance already logged" do
-      context "5 opportunities founded" do
-        before(:each) do
+
+      before(:each) do
           @selenium_directives_mock = double('selenium_directives')
 
           allow(@selenium_directives_mock).to receive(:logged?).and_return(true).ordered
@@ -27,7 +27,9 @@ describe OpportunitiesHunter do
 
           allow(@selenium_directives_mock).to receive(:send_message)
             .with(kind_of(Integer), kind_of(String)).ordered
-        end
+      end
+
+      context "5 opportunities founded" do
 
         let(:fake_opportunities) do
           (1..5).to_a.map do |i|
@@ -53,104 +55,69 @@ describe OpportunitiesHunter do
             expect(@selenium_directives_mock).to have_received(:send_message).once.with(fake_id, 'fake message')
           end
         end
+
       end
 
       context "12 opportunities founded" do
-        it "send messages just for the specified subject" do
-          selenium_directives_mock = double('selenium_directives')
 
-          fake_opportunities = []
-          10.times do |i|
-            i = i + 1
-            fake_opportunities <<
+        let(:fake_opportunities) do
+          fakes = (1..10).to_a.map do |i|
               {
-                username:     "fake username#{i}",
+                username:   "fake username#{i}",
                 request_id: "http://fakes/viewcprofile.aspx?trid=#{i.to_s * 3}",
-                subject:      %w{Math Science Chemistry Geometry Accounting Physics SAT Spanish Statistics}.sample,
-                date:         "fake date#{i}"
+                subject:    %w{Math Science Chemistry Geometry Accounting Physics SAT Spanish Statistics}.sample,
+                date:       "fake date#{i}"
               }
           end
 
-          fake_opportunities << { username: "fake usr707", request_id: "http://fakes/viewcprofile.aspx?trid=707",
+          fakes << { username: "fake usr707", request_id: "http://fakes/viewcprofile.aspx?trid=707",
             subject: "fake subject", date: "fake date77"
           }
 
-          fake_opportunities << { username: "fake usr808", request_id: "http://fakes/viewcprofile.aspx?trid=808",
+          fakes << { username: "fake usr808", request_id: "http://fakes/viewcprofile.aspx?trid=808",
             subject: "fake subject", date: "fake date808"
           }
 
-
-          fake_opportunities << { username: "fake usr909", request_id: "http://fakes/viewcprofile.aspx?trid=909",
+          fakes << { username: "fake usr909", request_id: "http://fakes/viewcprofile.aspx?trid=909",
             subject: "fake subject", date: "fake date909"
           }
 
-          allow(selenium_directives_mock).to receive(:logged?).and_return(true).ordered
-          allow(selenium_directives_mock).to receive(:setup_address).with(kind_of(String), kind_of(String), kind_of(String)).ordered
-          allow(selenium_directives_mock).to receive(:get_table_data_by_container_id).with(kind_of(String)).and_return({1 => fake_opportunities}).ordered
-          allow(selenium_directives_mock).to receive(:send_message).with(kind_of(Integer), kind_of(String)).ordered
+          fakes
+        end
 
-          fake_location  = Location.new({ city: "fake city", state: :NY, zip_code: 11011 })
-          sut = OpportunitiesHunter.new(selenium_directives_mock, "dummy@email.com", "dummy_password")
+        let(:fake_location) { Location.new({ city: "fake city", state: :NY, zip_code: 11011 }) }
 
-          sut.hunter_all(fake_location, "fake subject")
+        subject { OpportunitiesHunter.new(@selenium_directives_mock, "dummy@email.com", "dummy_password") }
 
-          expect(selenium_directives_mock).to have_received(:setup_address).once.with("fake city", "NY", "11011")
+        it "send messages just for the specified subject" do
+          subject.hunter_all(fake_location, "fake subject")
 
-          expect(selenium_directives_mock).to have_received(:send_message).with(any_args()).exactly(3)
+          expect(@selenium_directives_mock).to have_received(:setup_address).once.with("fake city", "NY", "11011")
+
+          expect(@selenium_directives_mock).to have_received(:send_message).with(any_args()).exactly(3)
 
           [707, 808, 909].each do |fake_id|
-            expect(selenium_directives_mock).to have_received(:send_message).once.with(fake_id, 'fake message')
+            expect(@selenium_directives_mock).to have_received(:send_message).once.with(fake_id, 'fake message')
           end
         end
 
         context "error to sent a message" do
+          before(:each) do
+            allow(@selenium_directives_mock).to receive(:send_message)
+              .with(808, 'fake message').and_raise('FailMessageSending')
+          end
+
           it "manage the error a sent the others messages" do
-            selenium_directives_mock = double('selenium_directives')
+            subject.hunter_all(fake_location, "fake subject")
 
-            fake_opportunities = []
-            10.times do |i|
-              i = i + 1
-              fake_opportunities <<
-                {
-                  username:     "fake username#{i}",
-                  request_id: "http://fakes/viewcprofile.aspx?trid=#{i.to_s * 3}",
-                  subject:      %w{Math Science Chemistry Geometry Accounting Physics SAT Spanish Statistics}.sample,
-                  date:         "fake date#{i}"
-                }
-            end
-
-            fake_opportunities << { username: "fake usr707", request_id: "http://fakes/viewcprofile.aspx?trid=707",
-              subject: "fake subject", date: "fake date77"
-            }
-
-            fake_opportunities << { username: "fake usr808", request_id: "http://fakes/viewcprofile.aspx?trid=808",
-              subject: "fake subject", date: "fake date808"
-            }
-
-
-            fake_opportunities << { username: "fake usr909", request_id: "http://fakes/viewcprofile.aspx?trid=909",
-              subject: "fake subject", date: "fake date909"
-            }
-
-            allow(selenium_directives_mock).to receive(:logged?).and_return(true).ordered
-            allow(selenium_directives_mock).to receive(:setup_address).with(kind_of(String), kind_of(String), kind_of(String)).ordered
-            allow(selenium_directives_mock).to receive(:get_table_data_by_container_id).with(kind_of(String)).and_return({1 => fake_opportunities}).ordered
-            allow(selenium_directives_mock).to receive(:send_message).with(kind_of(Integer), kind_of(String)).ordered
-            allow(selenium_directives_mock).to receive(:send_message).with(808, 'fake message').and_raise('FailMessageSending')
-
-            fake_location  = Location.new({ city: "fake city", state: :NY, zip_code: 11011 })
-            sut = OpportunitiesHunter.new(selenium_directives_mock, "dummy@email.com", "dummy_password")
-
-            sut.hunter_all(fake_location, "fake subject")
-
-            expect(selenium_directives_mock).to have_received(:setup_address).once.with("fake city", "NY", "11011")
-
-            expect(selenium_directives_mock).to have_received(:send_message).with(any_args()).exactly(3)
+            expect(@selenium_directives_mock).to have_received(:setup_address).once.with("fake city", "NY", "11011")
+            expect(@selenium_directives_mock).to have_received(:send_message).with(any_args()).exactly(3)
 
             [707, 808, 909].each do |fake_id|
-              expect(selenium_directives_mock).to have_received(:send_message).once.with(fake_id, 'fake message')
+              expect(@selenium_directives_mock).to have_received(:send_message).once.with(fake_id, 'fake message')
             end
           end
+
         end
       end
     end
