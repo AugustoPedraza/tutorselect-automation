@@ -3,30 +3,35 @@ require 'spec_helper'
 describe SeleniumDirectives do
   describe ".login" do
     context 'when user and pass are valid' do
-      it "success login" do
-        navigate_stub = double('navigate')
-
-        clickeable_el_mock = double('element')
-        allow(clickeable_el_mock).to receive(:send_keys)
-        allow(clickeable_el_mock).to receive(:click)
-
+      before(:each) do
         text_mock = double('spanElement')
-        text_mock.stub(:text).and_return('Hello FakeUser!')
+        allow(text_mock).to receive(:text).and_return('Hello FakeUser!')
 
-        driver_mock = double(Selenium::WebDriver::Driver)
-        driver_mock.stub(:navigate){ navigate_stub }
-        driver_mock.stub(:find_element).with(:class, an_instance_of(String) ).and_return(text_mock)
-        driver_mock.stub(:find_element).with(:id, an_instance_of(String) ).and_return(clickeable_el_mock)
+        @driver_mock = double(Selenium::WebDriver::Driver)
+        allow(@driver_mock).to receive(:navigate){ navigate_stub }
+        allow(@driver_mock).to receive(:find_element).with(:class, an_instance_of(String) ).and_return(text_mock)
+        allow(@driver_mock).to receive(:find_element).with(:id, an_instance_of(String) ).and_return(clickeable_el_mock)
+      end
 
-        sut = SeleniumDirectives.new driver_mock
+      let(:navigate_stub) { double('navigateElement') }
 
-        navigate_stub.should_receive(:to).with("https://www.tutorselect.com/login")
+      let(:clickeable_el_mock) do
+        mock = double('clickeableElement')
+        allow(mock).to receive(:send_keys)
+        allow(mock).to receive(:click)
 
-        clickeable_el_mock.should_receive(:send_keys).with('fake_email@rspec.com').once
-        clickeable_el_mock.should_receive(:send_keys).with('fake_pass123').once
-        clickeable_el_mock.stub(:send_keys)
+        mock
+      end
 
-        expect(sut.login('fake_email@rspec.com', 'fake_pass123')).to eq(true)
+      subject { SeleniumDirectives.new @driver_mock }
+
+      it "success login" do
+        expect(navigate_stub).to receive(:to).with("https://www.tutorselect.com/login")
+
+        expect(clickeable_el_mock).to receive(:send_keys).with('fake_email@rspec.com').once
+        expect(clickeable_el_mock).to receive(:send_keys).with('fake_pass123').once
+
+        expect(subject.login('fake_email@rspec.com', 'fake_pass123')).to eq(true)
       end
     end
   end
