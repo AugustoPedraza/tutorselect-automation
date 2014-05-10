@@ -37,49 +37,48 @@ describe SeleniumDirectives do
   end
 
   describe ".setup_address" do
-
-    before(:each) do
-      @driver_mock = double(Selenium::WebDriver::Driver)
-      allow(@driver_mock).to receive(:navigate).and_return(navigate_mock)
-      allow(@driver_mock).to receive(:find_element).with(:class, an_instance_of(String)).and_return(span_mock)
-      allow(@driver_mock).to receive(:find_element).with(:id,    an_instance_of(String)).and_return(generic_element_mock)
-    end
-
-    let(:navigate_mock) do
-      mock = double('navigateElement')
-      allow(mock).to receive(:to)
-
-      mock
-    end
-
-    let(:span_mock) do
-      mock = double('spanElement')
-      allow(mock).to receive(:text).and_return('Hello FakeUser!')
-
-      mock
-    end
-
-    let(:generic_element_mock) do
-      mock = double('element')
-
-      #Used as textbox
-      allow(mock).to receive(:clear)
-      allow(mock).to receive(:click)
-      allow(mock).to receive(:send_keys)
-
-      select_item_mock = double('SelectItem')
-      allow(select_item_mock).to receive(:click)
-      allow(select_item_mock).to receive(:selected?).and_return(:false)
-
-      #Used as combobox. This stub methods are required for Selenium::WebDriver::Support::Select
-      allow(mock).to receive(:tag_name).and_return('select')
-      allow(mock).to receive(:attribute).with(:multiple)
-      allow(mock).to receive(:find_elements).with(:xpath, an_instance_of(String)).and_return([select_item_mock])
-
-      mock
-    end
-
     context '.logged? is true' do
+      before(:each) do
+        @driver_mock = double(Selenium::WebDriver::Driver)
+        allow(@driver_mock).to receive(:navigate).and_return(navigate_mock)
+        allow(@driver_mock).to receive(:find_element).with(:class, an_instance_of(String)).and_return(span_mock)
+        allow(@driver_mock).to receive(:find_element).with(:id,    an_instance_of(String)).and_return(generic_element_mock)
+      end
+
+      let(:navigate_mock) do
+        mock = double('navigateElement')
+        allow(mock).to receive(:to)
+
+        mock
+      end
+
+      let(:span_mock) do
+        mock = double('spanElement')
+        allow(mock).to receive(:text).and_return('Hello FakeUser!')
+
+        mock
+      end
+
+      let(:generic_element_mock) do
+        mock = double('element')
+
+        #Used as textbox
+        allow(mock).to receive(:clear)
+        allow(mock).to receive(:click)
+        allow(mock).to receive(:send_keys)
+
+        select_item_mock = double('SelectItem')
+        allow(select_item_mock).to receive(:click)
+        allow(select_item_mock).to receive(:selected?).and_return(:false)
+
+        #Used as combobox. This stub methods are required for Selenium::WebDriver::Support::Select
+        allow(mock).to receive(:tag_name).and_return('select')
+        allow(mock).to receive(:attribute).with(:multiple)
+        allow(mock).to receive(:find_elements).with(:xpath, an_instance_of(String)).and_return([select_item_mock])
+
+        mock
+      end
+
       subject { SeleniumDirectives.new @driver_mock }
 
       it "navigate to profile edit url" do
