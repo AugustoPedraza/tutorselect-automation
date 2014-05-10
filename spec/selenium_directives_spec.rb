@@ -154,7 +154,9 @@ describe SeleniumDirectives do
         subject { SeleniumDirectives.new @driver_mock }
 
         it "select distance of 50 miles" do
-          allow(@driver_mock).to receive(:find_elements).with(:xpath, "//div[@id='id-main-table']/table/tbody/tr").and_return([])
+          allow(@driver_mock).to receive(:find_elements)
+            .with(:xpath, "//div[@id='id-main-table']/table/tbody/tr")
+            .and_return([])
 
           subject.get_table_data_by_container_id('id-main-table')
 
@@ -163,8 +165,14 @@ describe SeleniumDirectives do
         end
 
         context 'area request have just one page' do
-          it "get array of requests" do
-            table_rows_mock = []
+          before(:each) do
+            allow(@driver_mock).to receive(:find_elements)
+              .with(:xpath, "//div[@id='id-main-table']/table/tbody/tr")
+              .and_return(table_data_fakes)
+          end
+
+          let(:table_data_fakes) do
+            table_fakes = []
 
             3.times do |i|
               i = i + 1
@@ -188,10 +196,13 @@ describe SeleniumDirectives do
               tr_mock = double("trElement#{i}")
               allow(tr_mock).to receive(:find_elements).with(:tag_name, 'td').and_return(table_data_mock)
 
-              table_rows_mock << tr_mock
+              table_fakes << tr_mock
             end
 
-            allow(@driver_mock).to receive(:find_elements).with(:xpath, "//div[@id='id-main-table']/table/tbody/tr").and_return(table_rows_mock)
+            table_fakes
+          end
+
+          it "get array of requests" do
 
             actual = subject.get_table_data_by_container_id('id-main-table')
 
