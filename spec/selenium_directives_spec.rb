@@ -108,13 +108,17 @@ describe SeleniumDirectives do
     end
 
     context '.logged? is false' do
+      let(:driver_mock) do
+        mock = double(Selenium::WebDriver::Driver)
+        allow(mock).to receive(:find_element).with(:class, an_instance_of(String)).and_raise('element not found')
+
+        mock
+      end
+
+      subject { SeleniumDirectives.new driver_mock }
+
       it "throw exception" do
-        driver_mock = double(Selenium::WebDriver::Driver)
-        allow(driver_mock).to receive(:find_element).with(:class, an_instance_of(String)).and_raise('element not found')
-
-        sut = SeleniumDirectives.new driver_mock
-
-        expect { sut.setup_address('city', 'state', 'zip_code') }.to raise_error('invalid login')
+        expect { subject.setup_address('city', 'state', 'zip_code') }.to raise_error('invalid login')
       end
     end
   end
