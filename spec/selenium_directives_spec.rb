@@ -172,11 +172,8 @@ describe SeleniumDirectives do
           end
 
           let(:table_data_fakes) do
-            table_fakes = []
-
-            3.times do |i|
-              i = i + 1
-              table_data_mock = []
+            (1..3).to_a.map do |i|
+              tds_data = []
 
               username_link_mock = double("aElement#{i}")
               allow(username_link_mock).to receive(:attribute).with('href').and_return("http://fakes/username#{i}")
@@ -191,19 +188,16 @@ describe SeleniumDirectives do
               td_date_mock = double("tdDateElement#{i}")
               allow(td_date_mock).to receive(:text).and_return("fake date#{i}")
 
-              table_data_mock << td_username_mock << td_subject_mock << td_date_mock
+              tds_data << td_username_mock << td_subject_mock << td_date_mock
 
               tr_mock = double("trElement#{i}")
-              allow(tr_mock).to receive(:find_elements).with(:tag_name, 'td').and_return(table_data_mock)
+              allow(tr_mock).to receive(:find_elements).with(:tag_name, 'td').and_return(tds_data)
 
-              table_fakes << tr_mock
+              tr_mock
             end
-
-            table_fakes
           end
 
           it "get array of requests" do
-
             actual = subject.get_table_data_by_container_id('id-main-table')
 
             expect(actual).to eql({ 1 =>
