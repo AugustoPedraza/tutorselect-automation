@@ -151,11 +151,12 @@ describe SeleniumDirectives do
           allow(@driver_mock).to receive(:find_element).with(:id, 'Main_lb_opppgNext').and_raise(Selenium::WebDriver::Error::NoSuchElementError)
         end
 
+        subject { SeleniumDirectives.new @driver_mock }
+
         it "select distance of 50 miles" do
           allow(@driver_mock).to receive(:find_elements).with(:xpath, "//div[@id='id-main-table']/table/tbody/tr").and_return([])
 
-          sut = SeleniumDirectives.new @driver_mock
-          sut.get_table_data_by_container_id('id-main-table')
+          subject.get_table_data_by_container_id('id-main-table')
 
           expect(@driver_mock).to have_received(:find_element).with(:id, 'Main_ddl_oppDist').once
           expect(@element_mock).to have_received(:find_elements).with(:xpath, ".//option[@value = \"50\"]")
@@ -192,9 +193,7 @@ describe SeleniumDirectives do
 
             allow(@driver_mock).to receive(:find_elements).with(:xpath, "//div[@id='id-main-table']/table/tbody/tr").and_return(table_rows_mock)
 
-            sut = SeleniumDirectives.new @driver_mock
-
-            actual = sut.get_table_data_by_container_id('id-main-table')
+            actual = subject.get_table_data_by_container_id('id-main-table')
 
             expect(actual).to eql({ 1 =>
               [{ username: 'fake username1', request_id: 'http://fakes/username1', subject:  'fake subject1', date: 'fake date1' },
@@ -204,7 +203,7 @@ describe SeleniumDirectives do
           end
         end
 
-        context 'area request have three' do
+        context 'area request have three page' do
           it "navigate every page" do
             driver_mock = double(Selenium::WebDriver::Driver)
             allow(driver_mock).to receive(:navigate).and_return(@navigate_mock)
