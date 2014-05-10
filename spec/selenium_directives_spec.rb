@@ -209,35 +209,42 @@ describe SeleniumDirectives do
         end
 
         context 'area request have three page' do
-          it "navigate every page" do
-            driver_mock = double(Selenium::WebDriver::Driver)
-            allow(driver_mock).to receive(:navigate).and_return(@navigate_mock)
+          let(:next_page_link_mock) do
+            mock = double('linkElement')
+            allow(mock).to receive(:click)
 
+            mock
+          end
+
+          before(:each) do
             page_number = 1
 
-            next_page_link_mock = double('linkElement')
-            allow(next_page_link_mock).to receive(:click)
+            #Simulate the behaviour of navigation,
+            #throwing a exception when it doens't have other page to navitate
+            allow(@driver_mock).to receive(:find_element) do |type, value|
 
-            allow(driver_mock).to receive(:find_element) do |type, value|
-              return_value = nil
-
-              return_value = @span_mock    if type == :class
-              return_value = @element_mock if type == :id and value == 'Main_ddl_oppDist'
-
-              if type == :id and value == 'Main_lb_opppgNext'
+              if type == :class
+                return_value = @span_mock
+              elsif type == :id and value == 'Main_ddl_oppDist'
+                return_value = @element_mock
+              elsif type == :id and value == 'Main_lb_opppgNext'
                 raise Selenium::WebDriver::Error::NoSuchElementError if page_number > 3
                 return_value =  next_page_link_mock
                 page_number = page_number + 1
+              else
+                return_value = nil
               end
 
               return_value
             end
 
-            allow(driver_mock).to receive(:find_elements).with(:xpath, "//div[@id='id-main-table']/table/tbody/tr").and_return([])
+           allow(@driver_mock).to receive(:find_elements)
+            .with(:xpath, "//div[@id='id-main-table']/table/tbody/tr")
+            .and_return([])
+          end
 
-            sut = SeleniumDirectives.new driver_mock
-
-            actual = sut.get_table_data_by_container_id('id-main-table')
+          it "navigate every page" do
+            actual = subject.get_table_data_by_container_id('id-main-table')
 
             expect(next_page_link_mock).to have_received(:click).exactly(3)
           end
