@@ -18,9 +18,15 @@ begin
 
   opp_hunter = OpportunitiesHunter.new(SeleniumDirectives.new(driver), Config['user'], Config['pass'])
 
-  location = Location.new({city: 'San Jose', state: 'CA', zip_code: '95111'})
+  loop do
+    puts "Input the location, state and zip code commas separated, for setup your address (i.e. San Jose,CA,95111):"
+    input = gets.chomp
+    break if input.downcase.include?('exit')
+    city, state, zip_code = input.split(',').map{ |s| s.gsub(/\s{2,}/, '')}
+    location = Location.new({city: city, state: state, zip_code: zip_code})
 
-  opp_hunter.hunter_all(location, Config['subject'], Message)
+    opp_hunter.hunter_all(location, Config['subject'], Message)
+  end
 rescue Exception => e
   puts e
   puts e.backtrace.join("\n")
