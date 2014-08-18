@@ -1,2 +1,6 @@
 user: put here your user
 pass: put here your password
+subject: Spanish example
+message: |
+  Hello I hope your studies are going well for spanish!
+  etc.

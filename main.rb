@@ -6,10 +6,6 @@ require 'selenium_directives'
 require 'location'
 require 'opportunities_hunter'
 
-Message = "Hello I hope your studies are going well for spanish!
-  We currently have online tutors available! If you would like to get started send us a message or email us to Letsgettutoring@gmail.com"
-
-
 Selenium::WebDriver::Chrome.driver_path = File.expand_path './bin/chromedriver'
 Config = YAML.load_file('config.yml')
 
@@ -25,7 +21,7 @@ begin
     city, state, zip_code = input.split(',').map{ |s| s.gsub(/\s{2,}/, '')}
     location = Location.new({city: city, state: state, zip_code: zip_code})
 
-    opp_hunter.hunter_all(location, Config['subject'], Message)
+    opp_hunter.hunter_all(location, Config['subject'], Config['message'])
   end
 rescue Exception => e
   puts e
